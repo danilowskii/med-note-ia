@@ -13,22 +13,22 @@ export default function Initial() {
       <div className="w-[80%] max-w-[480px] h-[90%] flex flex-col gap-6">
         {/* ABAS */}
         <div className="flex justify-center w-full mb-4">
-          <div className="flex border-2 text-sm border-green-600 rounded overflow-hidden">
+          <div className="flex border-2 text-base border-green-600 rounded overflow-hidden">
             <button
-              className={`flex-1 px-10 text-white font-medium transition-colors ${
+              className={`flex-1 px-10 py-2 text-white font-medium transition-colors whitespace-nowrap ${
                 aba === "init"
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-green-200 text-green-800 hover:bg-green-300"
+                  ? "bg-green-600 text-white hover:bg-green-700"
+                  : "bg-green-200 text-green-600 hover:bg-green-300"
               }`}
               onClick={() => setAba("init")}
             >
               Iniciar
             </button>
             <button
-              className={`flex-1 px-10  text-white font-medium transition-colors ${
+              className={`flex-1 px-6 text-white font-medium transition-colors whitespace-nowrap ${
                 aba === "intro"
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-green-200 text-green-800 hover:bg-green-300"
+                  ? "bg-green-600 text-white hover:bg-green-700"
+                  : "bg-green-200 text-green-600 hover:bg-green-300"
               }`}
               onClick={() => setAba("intro")}
             >
@@ -45,6 +45,7 @@ export default function Initial() {
             </p>
 
             {/* Tipo de consulta */}
+            <p>Selecione a modalidade da consulta:</p>
             <div className="flex gap-4 flex-row justify-center">
               <button
                 className={`px-3 py-1 text-sm md:text-base md:px-4 md:py-2 rounded font-medium transition-colors ${
@@ -54,7 +55,7 @@ export default function Initial() {
                 }`}
                 onClick={() => setAppointment("presential")}
               >
-                Consulta presencial
+                Presencial
               </button>
               <button
                 className={`px-3 py-1 text-sm md:text-base md:px-4 md:py-2 rounded font-medium transition-colors ${
@@ -64,7 +65,7 @@ export default function Initial() {
                 }`}
                 onClick={() => setAppointment("online")}
               >
-                Consulta On-line
+                Teleconsulta
               </button>
             </div>
 
@@ -73,12 +74,12 @@ export default function Initial() {
               <Specialities />
             </div>
 
-            {/* Aviso do microfone */}
+            {/* Aviso para microfone */}
             <p className="p-4 border border-green-300 bg-green-100 text-green-800 text-sm rounded text-center">
               Por favor, antes de iniciar, ative a permissão do microfone no seu
               navegador para que a consulta possa ser gravada.
             </p>
-            <WebRecorder type={appointment} />
+            <WebRecorder appointmentType={appointment} />
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center p-6 bg-white rounded-xl shadow-md w-full gap-4">

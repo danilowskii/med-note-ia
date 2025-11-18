@@ -46,9 +46,10 @@ export default function Specialities() {
                 setOpen(true);
                 setSelectedSpeciality("Selecionar especialidade:");
               }}
-              className="cursor-pointer text-white hover:text-gray-200"
+              className="cursor-pointer md:text-base text-sm text-white hover:text-gray-200"
             >
-              {selectedSpeciality} <span className="absolute right-4">✕</span>
+              {selectedSpeciality}{" "}
+              <span className="absolute right-2 md:right-4">✕</span>
             </span>
           </span>
         ) : (

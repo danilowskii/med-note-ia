@@ -1,5 +1,5 @@
 import Menu from "../../components/SideMenu";
-import Transcription from "../../components/Transcription";
+
 import Initial from "../../components/Initial";
 
 export default function Home() {

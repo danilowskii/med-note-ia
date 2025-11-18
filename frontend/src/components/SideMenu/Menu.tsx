@@ -56,7 +56,7 @@ export default function Menu() {
             consultas
           </h3>
 
-          <div className="flex flex-col gap-0 h-[50%] border-b border-green-400 overflow-y-auto">
+          <div className="flex flex-col gap-0 h-[50%] border-b border-gray-300 overflow-y-auto">
             {fakeHistories.length > 0 ? (
               [...fakeHistories].reverse().map((history) => (
                 <div key={history.id} className="p-1">
@@ -106,19 +106,14 @@ export default function Menu() {
 
           <div className="flex flex-col gap-3 w-full items-center pt-4">
             <Button
-              onClick={() => console.log("cliquei no Iniciar consulta")}
-              variant="primary"
-              className="w-64 md:w-72 bg-green-200 hover:bg-green-800 text-green-900 hover:text-white"
-            >
-              INICIAR CONSULTA
-            </Button>
-            <Button
               onClick={() => console.log("cliquei no Dr. IAGO")}
               variant="secondary"
-              className="w-64 md:w-72  bg-green-600 hover:bg-green-700"
+              className="group w-64 md:w-72 shadow-md ease-in duration-200 text-green-950 transition-colors hover:text-white bg-slate-200 hover:bg-green-800"
             >
-              PERGUNTE AO DR.{" "}
-              <span className="bg-green-900 p-1 rounded text-white">IA</span>
+              ✨ PERGUNTE AO DR.{" "}
+              <span className="bg-green-900 ease-in transition-colors group-hover:bg-slate-200 p-1 group-hover:text-green-950 rounded text-white">
+                IA
+              </span>
               GO
             </Button>
           </div>
