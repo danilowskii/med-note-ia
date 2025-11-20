@@ -1,16 +1,21 @@
-import express, { type Request, type Response } from "express";
-import cors from "cors";
+import app from "./app.js";
+import http from "http";
+import { connectDB } from "./config/database.js";
+import dotenv from "dotenv";
+import initWebSocketServer from "./websocket/transcription/transcription.ws.js";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+//puxa as infos do .env
+dotenv.config();
 
-const PORT = 8000;
+//funcao para iniciar servidor com segurança
+async function startServer() {
+  const server = http.createServer(app);
+  initWebSocketServer(server);
 
-app.get("/", (req: Request, res: Response) => {
-  res.json("Eu estou funcionando");
-});
+  await connectDB(); //ativa a conexão com banco de dados
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => console.log(`Servidor rodando na porta: ${PORT}.`));
+}
+
+startServer();

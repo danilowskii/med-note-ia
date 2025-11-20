@@ -8,31 +8,41 @@ type Props = {
   webSocket: WebSocket | null;
   recording: boolean;
   paused: boolean;
-  audioURL: string | null;
+
   onPause: () => void;
   onResume: () => void;
   onStop: () => void;
 };
 
 // tipagem da mensagem websocket
-type MessageWebSocket = {
-  type: "partial_transcription" | "final_transcription";
-  text: string;
-};
+type MessageWebSocket =
+  | { type: "partial_transcription"; text: string } // chunks parciais
+  | {
+      type: "report_ready";
+      report: {
+        transcription: string;
+        diagnosis?: string;
+        summary?: string;
+        prescription?: string;
+        fullReport?: any;
+      };
+    }
+  | { type: "error"; message: string };
 
 export default function Transcription({
   appointmentType,
   webSocket,
   recording,
   paused,
-  audioURL,
+
   onPause,
   onResume,
   onStop,
 }: Props) {
   const wsRef = useRef<WebSocket | null>(null);
   const [partialTranscription, setPartialTranscription] = useState<string>("");
-  const [finalTranscription, setFinalTranscription] = useState<string[]>([]);
+  const [finalTranscription, setFinalTranscription] = useState<string>("");
+  const [fullReport, setFullReport] = useState<any>(null);
   const [appointmentNotes, setAppointmentNotes] = useState<string>("");
 
   useEffect(() => {
@@ -48,9 +58,14 @@ export default function Transcription({
           setPartialTranscription(message.text);
         }
 
-        if (message.type === "final_transcription") {
-          setFinalTranscription((prev) => [...prev, message.text]);
+        if (message.type === "report_ready") {
+          setFinalTranscription(message.report.transcription);
           setPartialTranscription("");
+          setFullReport(message.report);
+          console.log("Relatório completo recebido:", message.report);
+        }
+        if (message.type === "error") {
+          console.error("WS Error:", message.message);
         }
       } catch (error) {
         console.error("Erro ao processar mensagem WebSocket:", error);
@@ -62,57 +77,74 @@ export default function Transcription({
     };
   }, [webSocket]);
 
-  //funcao que envia payload para backend
-  const sendPayloadAppointment = async () => {
-    console.log("Criando o objeto payload...");
-    const payload = {
-      finalTranscription: finalTranscription.join(" "), //junta todas as transcricoes em 1 so
-      appointmentType,
-      appointmentNotes,
-      audioURL,
+  useEffect(() => {
+    if (!finalTranscription) return;
+
+    const sendFinalReport = async () => {
+      const payload = {
+        finalTranscription,
+        appointmentType,
+        appointmentNotes,
+
+        fullReport,
+      };
+
+      try {
+        const response = await api.post("diagnose", payload);
+        console.log("Relatório enviado para o backend:", response.data);
+      } catch (error) {
+        console.error("Erro ao enviar consulta:", error);
+      }
     };
-
-    console.log("Payload criado. Enviando JSON:", payload);
-
-    try {
-      console.log("Tentando enviar payload para o servidor em /diagnose.");
-      const response = await api.post("/api/diagnose", payload);
-      console.log("Relatório recebido:", response.data);
-    } catch (error) {
-      console.error("Erro ao enviar consulta:", error);
-    }
-  };
+  }, [finalTranscription, appointmentType, appointmentNotes, fullReport]);
 
   return (
-    <section className="absolute z-50 bg-gradient-to-b from-green-700 via-green-600 to-green-700 rounded-lg p-4 overflow-visible top-8 min-h-[500px] md:w-1/2 w-3/4">
+    <section className="z-50 bg-gradient-to-b from-slate-900 via-slate-900 border border-slate-200/50 to-slate-950 rounded-lg p-4 min-h-[550px] overflow-visible ">
       {/* Anotações */}
-      <div className="pb-3">
-        <p className="text-white text-lg pb-2">Anotações da consulta</p>
+      <div className="py-2">
+        <div className="flex flex-row justify-between">
+          <p className="text-white text-lg md:text-xl pb-2">
+            Anotações da consulta
+          </p>
+          <div className="pb-2">
+            <p className="text-slate-950 text-xs text-nowrap md:text-sm bg-gradient-to-tr from-slate-300 via-slate-200 to-slate-300 w-fit p-1 px-4 rounded">
+              Modalidade:{" "}
+              <span>
+                {appointmentType === "presential"
+                  ? "Presencial"
+                  : "Teleconsulta"}
+              </span>
+            </p>
+          </div>
+        </div>
         <textarea
           className="w-full rounded-lg text-gray-900 placeholder:text-slate-500 h-40 p-2 bg-green-200"
-          name="appointment-notes"
-          id="appointment-notes"
           value={appointmentNotes}
           onChange={(event) => setAppointmentNotes(event.target.value)}
           placeholder="Anote pontos importantes da consulta."
         />
       </div>
 
-      <div className="border-t border-gray-300">
-        <h2 className="text-white py-2 text-lg">Transcrição em tempo real</h2>
-
-        <div className="pb-2 flex items-end justify-end">
-          <p className="text-white text-sm bg-green-900 w-fit p-1 px-4 rounded">
-            Modalidade da consulta:{" "}
-            <span>
-              {appointmentType === "presential" ? "Presencial" : "Teleconsulta"}
-            </span>
-          </p>
+      {/* Transcrição em tempo real */}
+      <div className="border-t border-slate-200/50">
+        <div className="flex flex-row justify-between">
+          <h2 className="text-white py-2 text-lg md:text-xl">
+            Transcrição em tempo real
+          </h2>
+          {recording ? (
+            <p className="p-1 flex flex-row text-xs text-nowrap h-1/2 text-center rounded self-center bg-red-500 w-[100px]">
+              {recording ? "🎙️ Escutando..." : ""}
+            </p>
+          ) : (
+            ""
+          )}
         </div>
-
         <div className="bg-green-200 rounded-lg gap-2 h-40 p-2 overflow-y-auto">
           {partialTranscription ? (
-            <p className="text-gray-900">...{partialTranscription}</p>
+            <p className="text-slate-900">
+              - {partialTranscription}
+              <br />
+            </p>
           ) : (
             <p className="text-slate-500">
               A transcrição em tempo real aparecerá aqui
@@ -120,63 +152,46 @@ export default function Transcription({
           )}
         </div>
 
-        {/* Botões */}
-        <div className="flex flex-row justify-center items-center">
-          {recording && !paused && (
-            <div className="flex gap-4 py-4">
-              <Button
-                variant="secondary"
-                className="p-2 rounded text-white"
-                onClick={onPause}
-              >
-                ⏸ Pausar
-              </Button>
-
-              <Button
-                variant="primary"
-                className="p-2 rounded border border-white text-white"
-                onClick={() => {
-                  onStop();
-                  sendPayloadAppointment();
-                }}
-              >
-                ⏹ Terminar gravação
-              </Button>
-            </div>
-          )}
-
-          {recording && paused && (
-            <div className="flex gap-4 py-4">
-              <Button
-                variant="secondary"
-                className="p-2 rounded text-white"
-                onClick={onResume}
-              >
-                ▶ Retomar
-              </Button>
-
-              <Button
-                variant="primary"
-                className="p-2 rounded text-white border border-white"
-                onClick={() => {
-                  onStop();
-                  sendPayloadAppointment();
-                }}
-              >
-                ⏹ Terminar gravação
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Reproduzir áudio */}
-        <div>
-          {audioURL && (
-            <div className="py-8 flex gap-4 flex-col">
-              <p className="text-white py-2 text-lg">Gravação disponível:</p>
-              <audio className="w-full" controls src={audioURL} />
-            </div>
-          )}
+        {/* Botões de controle */}
+        <div className="flex flex-row pt-6 justify-center items-center">
+          <div className={`flex gap-4 py-2 ${!recording ? "invisible" : ""}`}>
+            {recording && !paused && (
+              <>
+                <Button
+                  variant="secondary"
+                  className="py-2 px-3 rounded text-white"
+                  onClick={onPause}
+                >
+                  ⏸
+                </Button>
+                <Button
+                  variant="primary"
+                  className="py-2 px-3 bg-slate-200 hover:bg-slate-300 rounded border border-white text-slate-950"
+                  onClick={onStop}
+                >
+                  <span className="mr-1">⏹</span> Terminar gravação
+                </Button>
+              </>
+            )}
+            {recording && paused && (
+              <>
+                <Button
+                  variant="secondary"
+                  className="bg-transparent py-2 px-3 rounded text-white"
+                  onClick={onResume}
+                >
+                  ▶
+                </Button>
+                <Button
+                  variant="primary"
+                  className="py-2 px-3 bg-slate-200 hover:bg-slate-300 rounded border border-white text-slate-950"
+                  onClick={onStop}
+                >
+                  <span className="mr-1">⏹</span> Terminar gravação
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </section>

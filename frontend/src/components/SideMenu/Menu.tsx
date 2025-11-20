@@ -6,6 +6,7 @@ import play from "../../assets/play.json";
 import { useState } from "react";
 import arrow from "../../assets/arrow.png";
 import Button from "../Button";
+import stars from "../../assets/stars.png";
 
 export default function Menu() {
   const [openMenu, setOpenMenu] = useState(false);
@@ -47,26 +48,26 @@ export default function Menu() {
       >
         {/* MENU */}
         <div
-          className="p-4 flex flex-col overflow-hidden text-green-50 
+          className="p-4 flex flex-col overflow-hidden text-white 
         h-[calc(100vh-50px)] rounded-r-2xl w-[280px] md:w-[300px] lg:w-[320px]
-        bg-gradient-to-b from-green-700 via-green-600 to-green-700"
+        bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-r-slate-200/50 border-y-slate-200/50 border-l-transparent border"
         >
           <h3 className="flex gap-2 items-center md:text-lg sticky pb-4 top-0">
             <img className="w-4 h-4" src={clock} alt="" /> Histórico de
             consultas
           </h3>
 
-          <div className="flex flex-col gap-0 h-[50%] border-b border-gray-300 overflow-y-auto">
+          <div className="flex flex-col gap-0 h-[50%] border-b border-slate-200/50 overflow-y-auto">
             {fakeHistories.length > 0 ? (
               [...fakeHistories].reverse().map((history) => (
                 <div key={history.id} className="p-1">
                   <div
                     className="group flex flex-row items-center justify-between 
-                        hover:bg-green-400 hover:text-black/80 hover:shadow-md p-3 
-                        cursor-pointer rounded-lg transition-colors"
+                        hover:bg-slate-50 hover:text-black/80 hover:shadow-md p-3 
+                        cursor-pointer rounded  transition-colors"
                   >
                     <div className="flex flex-col w-11/12">
-                      <h4 className="text-base font-bold line-clamp-1">
+                      <h4 className="text-base font-bold hover:text-slate-900 line-clamp-1">
                         {history.title}
                       </h4>
                       <p className="text-xs font-normal font-sans">
@@ -83,7 +84,7 @@ export default function Menu() {
               ))
             ) : (
               <div className="flex items-center justify-center flex-col h-full">
-                <p className="text-green-100 p-3 text-xl text-center">
+                <p className="text-white p-3 text-xl text-center">
                   Inicie uma consulta agora.
                 </p>
 
@@ -95,7 +96,7 @@ export default function Menu() {
                   >
                     <Lottie
                       animationData={play}
-                      className="lg:w-32 md:w-24 cursor-pointer"
+                      className="lg:w-28 md:w-24 cursor-pointer"
                       loop
                     />
                   </Button>
@@ -108,10 +109,11 @@ export default function Menu() {
             <Button
               onClick={() => console.log("cliquei no Dr. IAGO")}
               variant="secondary"
-              className="group w-64 md:w-72 shadow-md ease-in duration-200 text-green-950 transition-colors hover:text-white bg-slate-200 hover:bg-green-800"
+              className="group w-64  flex flex-row items-center justify-center md:w-72 shadow-md ease-in duration-200 text-[#0f172a] font-medium transition-colors  bg-slate-200 hover:shadow-[0px_0px_5px] hover:shadow-white/50 hover:bg-slate-50"
             >
-              ✨ PERGUNTE AO DR.{" "}
-              <span className="bg-green-900 ease-in transition-colors group-hover:bg-slate-200 p-1 group-hover:text-green-950 rounded text-white">
+              <img src={stars} className="w-5 h-5 mr-2" alt="" /> Pergunte ao
+              Dr.{" "}
+              <span className="bg-gradient-to-tr from-slate-700 via-slate-800 to-slate-500 ease-in transition-colors ml-1 px-1 rounded text-white">
                 IA
               </span>
               GO
@@ -119,13 +121,13 @@ export default function Menu() {
           </div>
 
           <div className="flex items-end justify-center">
-            <img className="absolute w-56 md:w-72 bottom-5" src={medNoteLogo} />
+            <img className="absolute w-56 md:w-72 bottom-7" src={medNoteLogo} />
           </div>
         </div>
 
         {/* BOTÃO QUE SE MOVE JUNTO */}
         <button
-          className="md:hidden bg-green-600 flex items-center justify-center p-1 rounded-r-full h-20 my-auto"
+          className="md:hidden bg-slate-900 flex items-center justify-center p-1 rounded-r-full h-20 my-auto"
           onClick={() => setOpenMenu(!openMenu)}
         >
           <img
