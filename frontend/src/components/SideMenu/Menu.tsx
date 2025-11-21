@@ -162,6 +162,17 @@ export default function Menu({ reportData }: MenuProps) {
               src={medNoteLogo}
             />
           </div>
+          <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-nowrap">
+            Desenvolvido por{" "}
+            <a
+              target="_blank"
+              className="underline"
+              rel="noopener noreferrer"
+              href="https://www.linkedin.com/in/paivadanilo/"
+            >
+              Danilo
+            </a>
+          </p>
         </div>
 
         {/* BOTÃO QUE SE MOVE JUNTO */}
