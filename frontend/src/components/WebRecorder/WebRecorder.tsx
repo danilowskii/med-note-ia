@@ -11,6 +11,7 @@ type Props = {
 };
 
 export default function WebRecorder({ appointmentType, speciality }: Props) {
+  const wSocketUrl = import.meta.env.VITE_WS_URL;
   const navigate = useNavigate();
   //para anotações
   const [notes, setNotes] = useState("");
@@ -57,7 +58,7 @@ export default function WebRecorder({ appointmentType, speciality }: Props) {
       micStreamRef.current = micStream;
       windowStreamRef.current = windowStream;
 
-      wsRef.current = new WebSocket("ws://localhost:8000/stream");
+      wsRef.current = new WebSocket(wSocketUrl);
       wsRef.current.binaryType = "arraybuffer";
       wsRef.current.onopen = () => {
         console.log("Websocket conectado para transcrição.");

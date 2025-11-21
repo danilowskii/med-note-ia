@@ -10,9 +10,7 @@ const app = express();
 //=========== middlewares globais ========
 app.use(
   cors({
-    origin: [process.env.URL_PROD, process.env.URL_DEV].filter(
-      (origin) => !!origin
-    ) as string[],
+    origin: process.env.CLIENT_ORIGIN,
   })
 );
 app.use(express.json());
@@ -24,7 +22,5 @@ app.use(morgan("dev"));
 //=========== rotas ===========
 const apiVersion: string = "/api/v1";
 app.use(`${apiVersion}`, routes); //config ficou /api/v1/nome da rota
-
-//============= middleware de erro global ===========
 
 export default app;
