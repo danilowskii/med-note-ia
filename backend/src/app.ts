@@ -7,24 +7,61 @@ import routes from "./routes/index.js";
 dotenv.config();
 
 const app = express();
-//=========== middlewares globais ========
+
+// ====================== CORS CONFIG ======================
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN, // localhost
+  process.env.CLIENT_PROD, // produção
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
   })
 );
+
+// LIBERA PRE-FLIGHT (OPTIONS)
+app.options("*", cors());
+
+//
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
+
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  );
+
+  next();
+});
+
+// ====================== MIDDLEWARES GLOBAIS ======================
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
-
-//logger para acompanhar requisicoes
 app.use(morgan("dev"));
 
+// ====================== HEALTH CHECK ======================
 app.get("/", (req, res) => {
   res.send("MedNote API funcionando");
 });
 
-//=========== rotas ===========
-const apiVersion: string = "/api/v1";
-app.use(`${apiVersion}`, routes); //config ficou /api/v1/nome da rota
+// ====================== ROTAS ======================
+const apiVersion = "/api/v1";
+app.use(apiVersion, routes);
 
 export default app;
