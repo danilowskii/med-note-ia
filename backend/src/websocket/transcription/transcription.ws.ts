@@ -4,11 +4,10 @@ import {
   groqPartialTranscription,
   groqFullTranscription,
 } from "../../services/groq.service.js";
-import { generateDiagnose } from "../../services/diagnose.service.js";
 
 interface Session {
   buffers: Buffer[];
-  baseBuffer: Buffer;
+  baseBuffer?: Buffer; // opcional e do tipo correto
 }
 
 const sessions = new WeakMap<WebSocket, Session>();
@@ -114,33 +113,6 @@ export default function initWebSocketServer(server: Server) {
               return;
             }
 
-            /*let savedReport;
-            try {
-              savedReport = await generateDiagnose(finalTranscript);
-            } catch (error) {
-              console.error("Erro em generateDiagnose:", error);
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "Erro ao gerar diagnóstico.",
-                })
-              );
-              return;
-            }
-            //envia tudo pro cliente
-            ws.send(
-              JSON.stringify({
-                type: "report_ready",
-                report: {
-                  transcription: finalTranscript,
-                  diagnosis: savedReport.diagnose ?? null,
-                  summary: savedReport.diagnose?.data?.resumo_tecnico ?? null,
-                  prescription:
-                    savedReport.diagnose?.data?.prescricao_estruturada ?? null,
-                  fullReport: savedReport,
-                },
-              })
-            );*/
             //limpar sessão
             sessions.delete(ws);
             return;
