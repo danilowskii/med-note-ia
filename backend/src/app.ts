@@ -19,6 +19,10 @@ app.use(urlencoded({ extended: true }));
 //logger para acompanhar requisicoes
 app.use(morgan("dev"));
 
+app.get("/", (req, res) => {
+  res.send("MedNote API funcionando");
+});
+
 //=========== rotas ===========
 const apiVersion: string = "/api/v1";
 app.use(`${apiVersion}`, routes); //config ficou /api/v1/nome da rota

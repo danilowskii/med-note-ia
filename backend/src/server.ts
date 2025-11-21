@@ -14,7 +14,7 @@ async function startServer() {
 
   await connectDB(); //ativa a conexão com banco de dados
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 8000;
   server.listen(PORT, () => console.log(`Servidor rodando na porta: ${PORT}.`));
 }
 
