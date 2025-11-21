@@ -4,7 +4,6 @@ import {
   transcribeAudioBuffer,
   transcribeText,
 } from "../services/transcribe.service.js";
-import { generateDiagnose } from "../services/diagnose.service.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),

@@ -21,11 +21,11 @@ export default function Button({
   switch (variant) {
     case "primary":
       variantStyle =
-        "bg-[#091b05] text-white hover:bg-[#091b05]/80 active:bg-[#050f03] disabled:bg-[#091b05]/50";
+        "bg-[#091b05]  hover:bg-[#091b05]/80 active:bg-[#050f03] disabled:bg-[#091b05]/50";
       break;
     case "secondary":
       variantStyle =
-        "bg-[#fff]/10 border text-white hover:bg-[#fff]/20 active:bg-[#fff]/30 disabled:bg-gray-900/70";
+        "bg-[#fff]/10 border  hover:bg-[#fff]/20 active:bg-[#fff]/30 disabled:bg-gray-900/70";
       break;
     case "none":
       variantStyle = "";

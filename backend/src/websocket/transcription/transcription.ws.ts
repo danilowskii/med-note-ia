@@ -114,7 +114,7 @@ export default function initWebSocketServer(server: Server) {
               return;
             }
 
-            let savedReport;
+            /*let savedReport;
             try {
               savedReport = await generateDiagnose(finalTranscript);
             } catch (error) {
@@ -140,7 +140,7 @@ export default function initWebSocketServer(server: Server) {
                   fullReport: savedReport,
                 },
               })
-            );
+            );*/
             //limpar sessão
             sessions.delete(ws);
             return;
@@ -196,8 +196,6 @@ export default function initWebSocketServer(server: Server) {
 
       try {
         const fullBuffer = Buffer.concat(session.buffers);
-        const finalTranscript = await groqFullTranscription(fullBuffer);
-        await generateDiagnose(finalTranscript);
       } catch (error) {
         console.error("Erro ao processa sessão de cliente fechado:", error);
       } finally {

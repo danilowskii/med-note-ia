@@ -3,7 +3,8 @@ import { generateDiagnose } from "../services/diagnose.service.js";
 
 export const diagnoseController = async (req: Request, res: Response) => {
   try {
-    const { transcript } = req.body;
+    const { transcript, appointmentType, appointmentNotes, speciality } =
+      req.body;
 
     if (!transcript || typeof transcript !== "string") {
       return res.status(400).json({
@@ -11,10 +12,16 @@ export const diagnoseController = async (req: Request, res: Response) => {
       });
     }
 
-    const savedReport = await generateDiagnose(transcript);
-
+    const savedReport = await generateDiagnose(
+      transcript,
+      appointmentType || "Presencial",
+      appointmentNotes || "",
+      speciality || "Clínica Médica"
+    );
+    console.log("Criado em diagnose controller:", savedReport);
     return res.status(201).json({
       message: "Diagnóstico gerado com sucesso.",
+
       report: savedReport,
     });
   } catch (error) {

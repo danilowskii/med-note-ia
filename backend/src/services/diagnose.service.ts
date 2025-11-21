@@ -5,54 +5,67 @@ import { client } from "../config/database.js";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export const generateDiagnose = async (transcript: string) => {
-  const prompt = `### SYSTEM ROLE & OBJECTIVE
-Você é uma IA Especialista em PNL Clínica e Estruturação de Dados Médicos (Senior Medical Scribe). Sua função é analisar transcrições de consultas e extrair dados estruturados com precisão para integração em sistemas de Prontuário Eletrônico (PEP).
+export const generateDiagnose = async (
+  transcript: string,
+  appointmentType: string,
+  appointmentNotes: string,
+  speciality: string
+) => {
+  const safeSpeciality = speciality || "Clínica Médica";
+  const safeType = appointmentType || "Presencial";
+  const safeNotes = appointmentNotes || "Nenhuma observação prévia.";
+  const systemPrompt = `
+### SYSTEM ROLE
+Você é uma IA Especialista em ${safeSpeciality} e em PNL Clínica (Senior Medical Scribe).
+Sua função é analisar transcrições de consultas e extrair dados estruturados para PEP.
 
-### DIRETRIZES DE SEGURANÇA E COMPLIANCE
-1. PRINCÍPIO DA VERACIDADE: Extraia APENAS informações explicitamente citadas. Se um dado (ex: dosagem) não estiver no texto, retorne null. JAMAIS invente ou alucine informações.
-2. NORMALIZAÇÃO TÉCNICA: Converta a linguagem coloquial do paciente (ex: "dor de cabeça") para a terminologia médica padrão (ex: "cefaleia") no campo específico.
-3. ESTRUTURAÇÃO FARMACÊUTICA: Separe rigorosamente o nome do fármaco, a concentração e as instruções de uso.
+### DIRETRIZES
+1. VERACIDADE: Se um dado não estiver no texto, retorne null ou array vazio [].
+2. NORMALIZAÇÃO: Converta termos coloquiais para termos técnicos médicos (pt-br).
+3. RACIOCÍNIO: Seja técnico e objetivo.
+4. AUTOEXPLICAÇÃO: Sempre explique suas hipóteses de forma clara e bem objetiva.
 
 ### OUTPUT FORMAT (JSON ONLY)
-Sua resposta deve ser ESTRITAMENTE um objeto JSON válido, sem blocos de markdown (\`\`\`) e sem texto introdutório. Siga este Schema:
-
+Responda APENAS com um objeto JSON válido. Siga este Schema estritamente:
 {
   "meta": {
     "status_processamento": "success",
-    "score_confianca": float (0.0 a 1.0 baseada na clareza do áudio)
+    "score_confianca": string (baseado na qualidade do áudio),
+    "especialidade": "${safeSpeciality}",
+    "tipoConsulta": "${safeType}"
   },
   "data": {
-    "resumo_tecnico": "string (Resumo conciso em linguagem formal médica, estilo SOAP)",
-    "sentimento_paciente": "string (Até 3 sentimentos detectados através da fala do paciente)"
+    "titulo": "string (Ex: Cefaleia Tensional)",
+    "resumo_tecnico": "string (Descrição SOAP completa com autoexplicação da sua teoria)",
+    "sentimento_paciente": "string (Ex: Ansioso, Colaborativo)",
     "sintomas_mapeados": [
-      {
-        "termo_tecnico": "string (termo médico padrão)"
-      }
+      { "termo_tecnico": "string" }
     ],
-    "hipoteses_diagnosticas": [
-      "string (Possíveis condições baseadas nos sintomas)"
-    ],
-    "recomendacoes_gerais": [
-      "string (Orientações não medicamentosas)"
-    ],
-    "exames_solicitados": [
-    "string (Exames relacionados à situação do paciente)"
-    ]
+    "hipoteses_diagnosticas": [ "string" ],
+    "recomendacoes_gerais": [ "string" ],
+    "exames_solicitados": [ "string" ], (nunca deixe exames_solicitados vazio)
     "prescricao_estruturada": [
       {
-        "nome_farmaco": "string (Nome genérico ou comercial citado)",
-        "concentracao": "string (ex: 500mg) ou null",
-        "posologia": "string (ex: Tomar 1 comprimido a cada 8 horas) ou null",
-        "duracao_tratamento": "string (ex: por 5 dias) ou null"
+        "nome_farmaco": "string",
+        "concentracao": "string or null",
+        "posologia": "string or null",
+        "duracao_tratamento": "string or null"
       }
-    ]
-      "contagem_palavras": "string (quantas palavras foram ditas com base no transcripto, inclui médico e paciente)"
+    ], (nunca deixe prescricao_estruturada vazio)
+    "contagem_palavras": "string"
   }
 }
+`;
 
-### TRANSCRIPT INPUT
-"""${transcript}"""`;
+  const userPrompt = `
+### DETALHES DO CONTEXTO:
+- Especialidade: ${safeSpeciality}
+- Tipo: ${safeType}
+- Notas do Médico: ${safeNotes}
+
+### TRANSCRIPT INPUT:
+"""${transcript}"""
+`;
 
   //chama a ia
   const response = await groq.chat.completions.create({
@@ -60,15 +73,20 @@ Sua resposta deve ser ESTRITAMENTE um objeto JSON válido, sem blocos de markdow
     messages: [
       {
         role: "system",
-        content:
-          "Você é uma IA Especialista em PNL Clínica e Estruturação de Dados Médicos (Senior Medical Scribe). Sua função é analisar transcrições de consultas e extrair dados estruturados com precisão para integração em sistemas de Prontuário Eletrônico (PEP).",
+        content: systemPrompt,
       },
-      { role: "user", content: prompt },
+      { role: "user", content: userPrompt },
     ],
     temperature: 0.2,
+    response_format: { type: "json_object" },
   });
 
-  const raw = response.choices[0]?.message?.content || "{}";
+  let raw = response.choices[0]?.message?.content || "{}";
+  // limpeza de segurança, remove markdown caso a ia n obedeça
+  raw = raw
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
 
   let diagnose;
   try {
@@ -77,10 +95,9 @@ Sua resposta deve ser ESTRITAMENTE um objeto JSON válido, sem blocos de markdow
     console.error("Erro ao parsear resposta da IA.", raw);
     diagnose = {
       meta: {
-        status_processamento: "error",
-        score_confianca: 0,
+        meta: { status_processamento: "error", erro: "Falha no parse JSON" },
+        data: { resumo_tecnico: "Erro ao processar o relatório da IA." },
       },
-      data: {},
     };
   }
 
@@ -94,10 +111,6 @@ Sua resposta deve ser ESTRITAMENTE um objeto JSON válido, sem blocos de markdow
     createdAt: new Date(),
   });
 
-  return {
-    _id: result.insertedId,
-    transcript,
-    diagnose,
-    createdAt: new Date(),
-  };
+  const saved = await collection.findOne({ _id: result.insertedId });
+  return saved;
 };

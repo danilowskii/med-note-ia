@@ -2,10 +2,10 @@ import path from "node:path";
 import fs from "node:fs";
 import { file as tmpFile } from "tmp-promise";
 import Groq from "groq-sdk";
-import { float32ToWav } from "../utils/float32ToWav.js";
+
 import "dotenv/config";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+export const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export const groqPartialTranscription = async (
   webmBuffer: Buffer

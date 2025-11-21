@@ -3,79 +3,109 @@ import clock from "../../assets/clock.png";
 import info from "../../assets/info.png";
 import Lottie from "lottie-react";
 import play from "../../assets/play.json";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import arrow from "../../assets/arrow.png";
 import Button from "../Button";
 import stars from "../../assets/stars.png";
+import api from "../../Services/api";
+import ContextualChat from "../ContextualChat";
 
-export default function Menu() {
-  const [openMenu, setOpenMenu] = useState(false);
-
-  type MyHistory = {
-    id: number;
-    title: string;
-    date: string;
-    content: string;
+interface Report {
+  _id: string;
+  createdAt: string;
+  diagnose?: {
+    meta?: {
+      especialidade?: string;
+      tipoConsulta?: string;
+    };
+    data?: {
+      titulo?: string;
+      resumo_tecnico?: string;
+    };
   };
+}
 
-  const fakeHistories: MyHistory[] = [
-    { id: 1, title: "Cefaleia", date: "2023-10-01", content: "" },
-    { id: 2, title: "Hipertensão", date: "2023-10-05", content: "" },
-    { id: 3, title: "Diabetes", date: "2023-10-10", content: "" },
-    { id: 4, title: "Cefaleia", date: "2023-10-01", content: "" },
-    { id: 5, title: "Hipertensão", date: "2023-10-05", content: "" },
-    { id: 6, title: "Diabetes", date: "2023-10-10", content: "" },
-    { id: 7, title: "Cefaleia", date: "2023-10-01", content: "" },
-    { id: 8, title: "Hipertensão", date: "2023-10-05", content: "" },
-    { id: 9, title: "Diabetes", date: "2023-10-10", content: "" },
-    { id: 10, title: "Cefaleia", date: "2023-10-01", content: "" },
-    { id: 11, title: "Hipertensão", date: "2023-10-05", content: "" },
-    {
-      id: 12,
-      title: "Diabetes tipo 2 melittus com asma",
-      date: "2023-10-10",
-      content: "",
-    },
-  ];
+interface MenuProps {
+  reportData?: {
+    data?: {
+      resumo_tecnico: string;
+      hipoteses_diagnosticas: any;
+    };
+    meta?: object;
+  };
+}
+
+export default function Menu({ reportData }: MenuProps) {
+  const [openChat, setOpenChat] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+  const [reports, setReports] = useState<Report[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getReports = async () => {
+      try {
+        const response = await api.get("/reports");
+        setReports(response.data.reports);
+      } catch (error) {
+        console.error("Erro ao buscar consultas.", error);
+      }
+    };
+    getReports();
+  }, []);
 
   return (
-    <section className="h-screen rounded-r-lg flex items-center overflow-hidden">
-      {/* CONTAINER QUE SE MOVE JUNTO (MENU + BOTÃO) */}
+    <section className="relative flex pt-6">
+      {/* MENU FIXO NO MOBILE, RELATIVE NO DESKTOP */}
       <div
         className={`flex transition-transform duration-300 ease-out md:translate-x-0
-      ${openMenu ? "translate-x-0" : "-translate-x-[90%]"}
-    `}
+          ${openMenu ? "translate-x-0" : "-translate-x-[88%]"}
+          fixed md:relative top-0 left-0 z-50
+        `}
       >
         {/* MENU */}
-        <div
-          className="p-4 flex flex-col overflow-hidden text-white 
-        h-[calc(100vh-50px)] rounded-r-2xl w-[280px] md:w-[300px] lg:w-[320px]
-        bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-r-slate-200/50 border-y-slate-200/50 border-l-transparent border"
-        >
-          <h3 className="flex gap-2 items-center md:text-lg sticky pb-4 top-0">
-            <img className="w-4 h-4" src={clock} alt="" /> Histórico de
-            consultas
+        <div className="p-4 flex flex-col overflow-hidden text-white h-screen md:h-[calc(100vh-50px)] rounded-r-2xl w-[280px] md:w-[300px] lg:w-[320px] bg-slate-900/95 backdrop-blur-sm border border-slate-700 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
+          {/* TÍTULO */}
+          <h3 className="flex gap-2 items-center md:text-lg pb-4 border-b border-slate-700 text-slate-300 font-semibold">
+            <img className="w-4 h-4 opacity-80" src={clock} alt="" />
+            Histórico de consultas
           </h3>
 
-          <div className="flex flex-col gap-0 h-[50%] border-b border-slate-200/50 overflow-y-auto">
-            {fakeHistories.length > 0 ? (
-              [...fakeHistories].reverse().map((history) => (
-                <div key={history.id} className="p-1">
+          {/* LISTA DE RELATÓRIOS */}
+          <div className="flex flex-col gap-0 h-[50%] border-b border-slate-700/60 overflow-y-auto mt-2 pr-1">
+            {reports.length > 0 ? (
+              [...reports].reverse().map((report) => (
+                <div key={report._id} className="p-1">
                   <div
-                    className="group flex flex-row items-center justify-between 
-                        hover:bg-slate-50 hover:text-black/80 hover:shadow-md p-3 
-                        cursor-pointer rounded  transition-colors"
+                    onClick={() =>
+                      navigate("/diagnostico", {
+                        state: { reportData: report.diagnose },
+                      })
+                    }
+                    className="group flex flex-row items-center justify-between
+                      bg-slate-800/40 border border-slate-700/60
+                      hover:bg-slate-700/50 hover:border-slate-500
+                      p-3 cursor-pointer rounded-lg transition-all duration-150 shadow-sm"
                   >
                     <div className="flex flex-col w-11/12">
-                      <h4 className="text-base font-bold hover:text-slate-900 line-clamp-1">
-                        {history.title}
+                      <h4 className="text-base font-bold text-slate-200 group-hover:text-white line-clamp-1">
+                        {report.diagnose?.data?.titulo}
                       </h4>
-                      <p className="text-xs font-normal font-sans">
-                        {history.date}
+                      <p className="text-xs text-slate-400 font-sans">
+                        {new Date(report.createdAt).toLocaleDateString("pt-BR")}{" "}
+                        •{" "}
+                        {new Date(report.createdAt).toLocaleTimeString(
+                          "pt-BR",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
                       </p>
                     </div>
+
                     <img
-                      className="w-5 h-auto brightness-[0.1] hidden group-hover:block"
+                      className="w-5 h-auto opacity-0 group-hover:opacity-80 transition-opacity"
                       src={info}
                       alt=""
                     />
@@ -83,60 +113,88 @@ export default function Menu() {
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-center flex-col h-full">
-                <p className="text-white p-3 text-xl text-center">
+              <div className="flex items-center justify-center flex-col h-full text-center">
+                <p className="text-slate-300 p-3 text-lg">
                   Inicie uma consulta agora.
                 </p>
 
-                <div className="items-center justify-center flex">
-                  <Button
-                    variant="none"
-                    onClick={() => console.log("cliquei no play")}
-                    className="!bg-none !border-none"
-                  >
-                    <Lottie
-                      animationData={play}
-                      className="lg:w-28 md:w-24 cursor-pointer"
-                      loop
-                    />
-                  </Button>
-                </div>
+                <Button
+                  variant="none"
+                  onClick={() => console.log("cliquei no play")}
+                  className="!bg-none !border-none"
+                >
+                  <Lottie
+                    animationData={play}
+                    className="lg:w-28 md:w-24 cursor-default opacity-90 hover:opacity-100 transition-opacity"
+                    loop
+                  />
+                </Button>
               </div>
             )}
           </div>
 
+          {/* BOTÃO IAGO */}
           <div className="flex flex-col gap-3 w-full items-center pt-4">
             <Button
-              onClick={() => console.log("cliquei no Dr. IAGO")}
+              onClick={() => setOpenChat(true)}
               variant="secondary"
-              className="group w-64  flex flex-row items-center justify-center md:w-72 shadow-md ease-in duration-200 text-[#0f172a] font-medium transition-colors  bg-slate-200 hover:shadow-[0px_0px_5px] hover:shadow-white/50 hover:bg-slate-50"
+              className="group w-64 flex flex-row items-center justify-center md:w-72
+                shadow-lg bg-slate-200 text-gray-900/90 font-medium rounded-lg
+                hover:bg-white hover:shadow-[0_0_10px] hover:shadow-white/40
+                transition-all duration-200"
             >
-              <img src={stars} className="w-5 h-5 mr-2" alt="" /> Pergunte ao
-              Dr.{" "}
-              <span className="bg-gradient-to-tr from-slate-700 via-slate-800 to-slate-500 ease-in transition-colors ml-1 px-1 rounded text-white">
+              <img src={stars} className="w-5 animate-pulse h-5 mr-2" alt="" />
+              Pergunte ao Dr.
+              <span
+                className="bg-gradient-to-tr from-slate-700 via-slate-800 to-slate-600 
+                  ml-1 px-1 rounded text-white font-bold"
+              >
                 IA
               </span>
               GO
             </Button>
           </div>
 
-          <div className="flex items-end justify-center">
-            <img className="absolute w-56 md:w-72 bottom-7" src={medNoteLogo} />
+          {/* LOGO */}
+          <div className="flex justify-center mt-8 relative">
+            <img
+              className="w-56 md:w-72 opacity-90 drop-shadow-lg"
+              src={medNoteLogo}
+            />
           </div>
         </div>
 
         {/* BOTÃO QUE SE MOVE JUNTO */}
         <button
-          className="md:hidden bg-slate-900 flex items-center justify-center p-1 rounded-r-full h-20 my-auto"
+          className="md:hidden bg-slate-900 border border-slate-700 flex items-center justify-center p-1 rounded-r-full h-20 my-auto shadow-lg z-60"
           onClick={() => setOpenMenu(!openMenu)}
         >
           <img
             src={arrow}
             className={`w-8 h-8 transition-transform duration-300 ease-out
-          ${openMenu ? "rotate-180" : ""}`}
+              ${openMenu ? "rotate-180" : ""}`}
           />
         </button>
       </div>
+
+      {/* CHAT */}
+      {openChat && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 w-full max-w-lg p-6 rounded-2xl shadow-lg relative flex flex-col gap-4">
+            <button
+              className="absolute top-10 right-10 text-white font-bold text-xl"
+              onClick={() => setOpenChat(false)}
+            >
+              ✕
+            </button>
+
+            <ContextualChat
+              transcript={reportData?.data?.resumo_tecnico || ""}
+              diagnose={reportData?.data?.hipoteses_diagnosticas || ""}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
