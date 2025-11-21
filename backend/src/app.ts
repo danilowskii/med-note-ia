@@ -29,10 +29,6 @@ app.use(
   })
 );
 
-// LIBERA PRE-FLIGHT (OPTIONS)
-app.options("/*", cors());
-
-//
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
