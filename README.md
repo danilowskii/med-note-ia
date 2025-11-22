@@ -1,20 +1,26 @@
 # MedNote - Medico Copilot
 
-Aplicação Fullstack para transcrição e análise médica usando IA (Groq).
+**MedNote** é uma aplicação **Fullstack** projetada para auxiliar profissionais de saúde, **automatizando a transcrição** de consultas e **gerando análises clínicas detalhadas** (anamnese, sugestão de diagnóstico, método SOAP) utilizando o poder da **Inteligência Artificial** generativa (Groq/Llama 3).
 
-## 🛠 Tecnologias
+## 🛠 Tecnologias Utilizadas
+O projeto foi construído utilizando uma **arquitetura Monorepo**.
 
-**Frontend:**
+### Frontend (Client)
+- Core: React 18 + Vite (Build ultrarrápido).
+- Linguagem: TypeScript.
+- Estilização: TailwindCSS (Utility-first CSS).
+- Roteamento: React Router 7 (Data API).
+- HTTP Client: Axios.
 
-- React 18, TypeScript, TailwindCSS, Vite, React Router 7, Axios, Lottie React
-
-**Backend:**
-
-- Node.js, Express 5, TypeScript (tsx), MongoDB (Native Driver), Groq SDK, WebSocket (ws), Multer
+### Backend (Server)
+- Runtime: Node.js.
+- Framework: Express 5 (Beta - Melhor tratamento de erros assíncronos).
+- Linguagem: TypeScript (executado via tsx para desenvolvimento).
+- Banco de Dados: MongoDB (Native Driver - para máxima performance e controle).
+- AI SDK: Groq SDK (Inferência rápida de LLMs).
+- Real-time: WebSocket (ws).
 
 ## 🚀 Instalação e Execução
-
-Monorepo. Rode backend e frontend em terminais separados.
 
 ## 1. Backend (API & WebSocket)
 
@@ -61,15 +67,15 @@ npm run dev
 # Vite em http://localhost:5173
 ```
 
-## 📡 Endpoints Principais
+## 📡 Principais Endpoints 
 
 ```bash
-|  Método   |   Rota   |               Descrição                  |
-|-----------|----------|------------------------------------------|
-| POST      | /upload  | Upload de áudio/arquivo (Multer)         |
-| POST      |  /chat   | Envio de mensagens para IA (Groq)        |
-| GET       | /history | Histórico do MongoDB                     |
-| WS        | /stream  | WebSocket para respostas em tempo real   |
+|  Método   |   Rota      |               Descrição                  |
+|-----------|-------------|------------------------------------------|
+| POST      | /transcribe | Transcrição de áudio em tempo real       |
+| POST      |  /diagnose  | Geração de diagnóstico clínico com IA    |
+| POST      |   /chat     | Envio de mensagens para IA (Groq)        |
+| GET       |   /reports  | Histórico de consultas (MongoDB)         |
 ```
 
 ## 📦 Estrutura do Repositório
