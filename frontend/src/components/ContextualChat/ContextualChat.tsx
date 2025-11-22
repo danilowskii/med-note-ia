@@ -62,7 +62,7 @@ export default function ContextualChat({
 
   return (
     <div className="w-full font-serif bg-slate-800 shadow p-4 rounded-xl  flex flex-col h-[500px]">
-      <h2 className="font-bold text-xl text-white mb-3">
+      <h2 className="font-bold text-l md:text-xl text-white mb-3">
         💬 Pergunte ao Dr. IAGO
       </h2>
 
@@ -103,7 +103,7 @@ export default function ContextualChat({
       </div>
 
       {/* Botão Explique o Diagnóstico */}
-      <div className="mt-3 flex justify-end">
+      <div className="mt-3 flex justify-center">
         <Button
           onClick={() =>
             handleSend("Explique este diagnóstico detalhadamente.")
