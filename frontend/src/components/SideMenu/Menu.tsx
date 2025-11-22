@@ -64,7 +64,7 @@ export default function Menu({ reportData }: MenuProps) {
         `}
       >
         {/* MENU */}
-        <div className="p-4 flex flex-col overflow-hidden text-white h-screen md:h-[calc(100vh-50px)] rounded-r-2xl w-[280px] md:w-[300px] lg:w-[320px] bg-slate-900/95 backdrop-blur-sm border border-slate-700 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
+        <div className="p-4 flex flex-col overflow-hidden text-white h-screen md:h-[calc(100vh-50px)] rounded-r-2xl w-[280px] md:w-[300px] lg:w-[320px] bg-slate-900/95 backdrop-blur-sm border-y border-r border-slate-700 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
           {/* TÍTULO */}
           <h3 className="flex gap-2 items-center md:text-lg pb-4 border-b border-slate-700 text-slate-300 font-semibold">
             <img className="w-4 h-4 opacity-80" src={clock} alt="" />
@@ -162,7 +162,7 @@ export default function Menu({ reportData }: MenuProps) {
               src={medNoteLogo}
             />
           </div>
-          <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-nowrap">
+          <p className="absolute bottom-24 md:bottom-4 left-1/2 -translate-x-1/2 text-nowrap">
             Desenvolvido por{" "}
             <a
               target="_blank"

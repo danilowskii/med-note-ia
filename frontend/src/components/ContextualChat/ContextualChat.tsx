@@ -87,18 +87,18 @@ export default function ContextualChat({
       </div>
 
       {/* Input + Send */}
-      <div className="flex items-center gap-2">
+      <div className="flex justify-between w-full items-center gap-2">
         <input
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Digite sua pergunta clínica..."
-          className="flex-1 bg-slate-200 border px-3 py-2 rounded-lg"
+          placeholder="Digite sua pergunta..."
+          className="flex-1  bg-slate-200 border p-2 rounded-lg"
         />
         <Button
           onClick={() => handleSend()}
-          className="bg-slate-800 border text-base text-white mdpx-4 py-2 rounded-lg hover:bg-slate-600"
+          className="bg-slate-800 border text-base text-white md:px-4 py-2 rounded-lg hover:bg-slate-600"
         >
-          Enviar
+          ➤
         </Button>
       </div>
 

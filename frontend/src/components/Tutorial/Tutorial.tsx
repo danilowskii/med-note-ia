@@ -5,7 +5,7 @@ import image4 from "../../assets/4.png";
 
 export default function Tutorial() {
   return (
-    <div className="h-[600px] overflow-y-auto text-white p-2 rounded-lg shadow-lg">
+    <div className="h-[400px] overflow-y-auto text-white p-2 rounded-lg shadow-lg">
       {/* 1. Iniciando uma Nova Transcrição */}
       <section className="pb-8 border-b border-b-white/50">
         <h2 className="text-xl font-bold mb-2">
