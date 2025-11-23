@@ -10,6 +10,7 @@ import Button from "../Button";
 import stars from "../../assets/stars.png";
 import api from "../../Services/api";
 import ContextualChat from "../ContextualChat";
+import Iridescence from "../Iridescence";
 
 interface Report {
   _id: string;
@@ -135,24 +136,48 @@ export default function Menu({ reportData }: MenuProps) {
 
           {/* BOTÃO IAGO */}
           <div className="flex flex-col gap-3 w-full items-center pt-4">
-            <Button
+            <div
               onClick={() => setOpenChat(true)}
-              variant="secondary"
-              className="group w-64 flex flex-row items-center justify-center md:w-72
-                shadow-lg bg-slate-200 text-gray-900/90 font-medium rounded-lg
-                hover:bg-white hover:shadow-[0_0_10px] hover:shadow-white/40
+              className="overflow-hidden relative cursor-pointer py-3 group w-64 flex flex-row items-center justify-center md:w-72
+                shadow-lg  text-gray-900/90 font-medium rounded-lg
+                hover:shadow-[0_0_10px] hover:shadow-white/40
                 transition-all duration-200"
             >
-              <img src={stars} className="w-5 animate-pulse h-5 mr-2" alt="" />
-              Pergunte ao Dr.
+              <div
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  position: "absolute",
+                  zIndex: "-10",
+                }}
+              >
+                <Iridescence
+                  enabledWaves={["top", "middle", "bottom"]}
+                  linesGradient={["#ffffff", "#f0f7ff", "#dbeafe"]}
+                  // Array - specify line count per wave; Number - same count for all waves
+                  lineCount={[10, 15, 20]}
+                  // Array - specify line distance per wave; Number - same distance for all waves
+                  lineDistance={[8, 6, 4]}
+                  bendRadius={5.0}
+                  bendStrength={-0.5}
+                  interactive={false}
+                  parallax={true}
+                />
+              </div>
+              <img
+                src={stars}
+                className="w-5 animate-pulse brightness-0 h-5 mr-2"
+                alt=""
+              />
+              <span className="font-extrabold">Pergunte ao Dr.</span>
               <span
                 className="bg-gradient-to-tr from-slate-700 via-slate-800 to-slate-600 
-                  ml-1 px-1 rounded text-white font-bold"
+                  ml-1 px-1 rounded text-white font-extrabold"
               >
                 IA
               </span>
-              GO
-            </Button>
+              <span className="font-extrabold">GO</span>
+            </div>
           </div>
 
           {/* LOGO */}

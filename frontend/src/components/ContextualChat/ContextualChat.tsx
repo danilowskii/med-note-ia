@@ -62,18 +62,18 @@ export default function ContextualChat({
 
   return (
     <div className="w-full font-serif bg-slate-800 shadow p-4 rounded-xl  flex flex-col h-[500px]">
-      <h2 className="font-bold text-l md:text-xl text-white mb-3">
+      <h2 className="font-bold border-b border-white/50 pb-3 text-l md:text-xl text-white mb-3">
         💬 Pergunte ao Dr. IAGO
       </h2>
 
       {/* Chat messages */}
-      <div className="flex-1 h-64 overflow-y-auto border border-slate-900/50 rounded-lg p-3 mb-4 bg-slate-300">
+      <div className="flex-1 h-64 overflow-y-auto rounded-lg p-3 mb-4 bg-">
         {chat.map((message, id) => (
           <div
             key={id}
             className={`mb-3 p-2 rounded-lg whitespace-pre-wrap max-w-[80%] ${
               message.sender === "doctor"
-                ? "bg-slate-700 text-white ml-auto"
+                ? "bg-slate-950 text-white ml-auto"
                 : "bg-slate-200 text-gray-800 mr-auto"
             }`}
           >
